@@ -21,6 +21,6 @@ connection.once("open", () => {
 
 app.use("/api/users",userRouter)
 
-app.listen(3000, () => {
+app.listen(300, () => {
   console.log("server is running on port 3000");
 });
