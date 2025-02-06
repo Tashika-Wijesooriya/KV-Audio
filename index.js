@@ -8,7 +8,7 @@ let app = express();
 app.use(bodyParser.json());
 
 let mongoUrl =
-  "mongodb+srv://admin:123@cluster0.ko33q.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+  "mongodb+srv://tashika:1234@cluster0.vf5sl.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
 mongoose.connect(mongoUrl);
 
@@ -21,6 +21,6 @@ connection.once("open", () => {
 
 app.use("/api/users",userRouter)
 
-app.listen(300, () => {
+app.listen(3000, () => {
   console.log("server is running on port 3000");
 });
