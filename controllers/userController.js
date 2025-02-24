@@ -1,5 +1,6 @@
 import User from "../models/user.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 export function registerUser(req, res) {
   const data = req.body;
@@ -31,15 +32,22 @@ export function loginUser(req, res) {
       );
 
       if (isPasswordCorrect) {
-        res.json({ message: "Login successful" });
+        const token = jwt.sign(
+          {
+            firstName: user.firstName,
+            lastName: user.lastName,
+            role: user.role,
+          },
+          "kv-secret-89"
+        );
+
+        res.json({ message: "Login successful", token: token });
       } else {
         res.status(401).json({ message: "Login failed" });
       }
     }
   });
 }
-
-
 
 // import User from "../models/user.js";
 // import bcrypt from "bcrypt";
@@ -95,4 +103,3 @@ export function loginUser(req, res) {
 //     res.status(500).json({ message: "An error occurred", error: err.message });
 //   }
 // }
-
