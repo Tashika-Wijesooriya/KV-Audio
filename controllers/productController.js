@@ -1,6 +1,7 @@
 import Product from "../models/product.js";
 
 export function addProduct(req, res) {
+    console.log(req.user);
     const data = req.body;
     const newProduct = new Product(data);
     newProduct.save().then(() => {
