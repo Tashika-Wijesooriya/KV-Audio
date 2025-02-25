@@ -4,6 +4,8 @@ import mongoose from "mongoose";
 import userRouter from "./routes/userRouter.js";
 import productRouter from "./routes/productRouter.js";
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+dotenv.config();
 
 let app = express();
 
@@ -25,8 +27,7 @@ app.use((req, res, next) => {
   next();
 });
 
-let mongoUrl =
-  "mongodb+srv://tashika:1234@cluster0.vf5sl.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+let mongoUrl = process.env.MONGO_URL;
 
 mongoose.connect(mongoUrl);
 
@@ -40,6 +41,6 @@ connection.once("open", () => {
 app.use("/api/users", userRouter)
 app.use("/api/products", productRouter)
 
-app.listen(3000, () => {
+app.listen(3500, () => {
   console.log("server is running on port 3000");
 });
