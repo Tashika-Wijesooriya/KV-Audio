@@ -32,6 +32,12 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  profilePicture: {
+    type: String,
+    required: true,
+    default:
+      "https://i.pinimg.com/474x/03/eb/d6/03ebd625cc0b9d636256ecc44c0ea324.jpg",
+  },
 });
 
 const User = mongoose.model("User", userSchema);
