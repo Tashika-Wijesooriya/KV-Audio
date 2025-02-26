@@ -49,9 +49,35 @@ export function getReviews(req, res) {
   }
 }
 
-export  function deleteReview(req, res) {
+export function deleteReview(req, res) {
   const email = req.params.email;
 
+  if (req.user == null) {
+    res.status(401).json({ message: "login first" });
+    return;
+  }
+
+  if ((req.user.role = "admin")) {
+    Review.deleteOne({ email: email })
+      .then(() => {
+        res.json({ message: "Review deleted successfully" });
+      })
+      .catch((err) => {
+        res.status(500).json({ message: "Review could not be deleted" });
+      });
+    return;
+  }
+  if (req.user.email == email) {
+    Review.deleteOne({ email: email })
+      .then(() => {
+        res.json({ message: "Review deleted successfully" });
+      })
+      .catch((err) => {
+        res.status(500).json({ message: "Review could not be deleted" });
+      });
+  } else {
+    res.status(403).json({ message: "unauthorized" });
+  }
   Review.deleteOne({ email: email })
     .then(() => {
       res.json({ message: "Review deleted successfully" });
@@ -59,4 +85,30 @@ export  function deleteReview(req, res) {
     .catch((err) => {
       res.status(500).json({ message: "Review could not be deleted" });
     });
-};
+}
+
+export function approveReview(req, res) {
+  const email = req.params.email;
+
+  if (req.user == null) {
+    res.status(401).json({ message: "login first" });
+    return;
+  }
+
+  if ((req.user.role = "admin")) {
+    Review.updateOne(
+      { email: email },
+      {
+        isApproved: true,
+      }
+    )
+      .then(() => {
+        res.json({ message: "Review approved successfully" });
+      })
+      .catch((err) => {
+        res.status(500).json({ message: "Review could not be approved" });
+      });
+  } else {
+    res.status(403).json({ message: "unauthorized" });
+  }
+}

@@ -17,7 +17,7 @@ app.use((req, res, next) => {
   if (token != null) {
     token = token.replace("Bearer ", "");
 
-    console.log(token);
+    //console.log(token);
 
     jwt.verify(token, process.env.JWT_SECRET, (err, decode) => {
       if (!err) {
