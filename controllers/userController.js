@@ -40,9 +40,9 @@ export function loginUser(req, res) {
             firstName: user.firstName,
             lastName: user.lastName,
             role: user.role,
-            profilePicture: user.profilePicture
+            profilePicture: user.profilePicture,
           },
-         process.env.JWT_SECRET
+          process.env.JWT_SECRET
         );
 
         res.json({ message: "Login successful", token: token });
@@ -107,7 +107,6 @@ export function loginUser(req, res) {
 //     res.status(500).json({ message: "An error occurred", error: err.message });
 //   }
 // }
-
 
 //"email": "john.doe@hdhjd.com",
 //  "password": "1dhbfjhsdgfjhf234",

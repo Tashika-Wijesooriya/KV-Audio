@@ -21,7 +21,7 @@ app.use((req, res, next) => {
 
     jwt.verify(token, process.env.JWT_SECRET, (err, decode) => {
       if (!err) {
-        req.user =decode;
+        req.user = decode;
       }
     });
   }
@@ -37,11 +37,9 @@ connection.once("open", () => {
   console.log("MongoDB connected successfuly");
 });
 
-
-
-app.use("/api/users", userRouter)
-app.use("/api/products", productRouter)
-app.use("/api/reviews", reviewRouter)
+app.use("/api/users", userRouter);
+app.use("/api/products", productRouter);
+app.use("/api/reviews", reviewRouter);
 
 app.listen(3500, () => {
   console.log("server is running on port 3000");
