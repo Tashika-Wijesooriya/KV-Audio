@@ -28,9 +28,24 @@ export function addProduct(req, res) {
 }
 
 export async function getProducts(req, res) {
+
+let isAdmin = false;
+
+if (req.user != null) {
+  if( req.user.role == "admin") {
+    isAdmin = true;
+  };
+}
+
   try {
-    const product = await Product.find();
-    res.json(product);
+   if(isAdmin) {
+    const products = await Product.find();
+    res.json(products);
+   } else {
+    const products = await Product.find({ isApproved: true });
+     res.json(products);
+     return;
+   }
     
   } catch (error) {
     res.status(500).json({ message: "Could not fetch products" });
