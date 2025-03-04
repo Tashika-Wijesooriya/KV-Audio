@@ -1,4 +1,5 @@
 import Product from "../models/product.js";
+import { isItAdmin } from "./userController.js";
 
 export function addProduct(req, res) {
   console.log(req.user);
@@ -28,28 +29,18 @@ export function addProduct(req, res) {
 }
 
 export async function getProducts(req, res) {
-
-let isAdmin = false;
-
-if (req.user != null) {
-  if( req.user.role == "admin") {
-    isAdmin = true;
-  };
-}
-
   try {
-   if(isAdmin) {
-    const products = await Product.find();
+    let products;
+    if (isItAdmin(req)) {
+      products = await Product.find();
+    } else {
+      products = await Product.find({ availability: true });
+    }
     res.json(products);
-   } else {
-    const products = await Product.find({ isApproved: true });
-     res.json(products);
-     return;
-   }
-    
   } catch (error) {
-    res.status(500).json({ message: "Could not fetch products" });
-    
+    console.error("Error fetching products:", error);
+    res
+      .status(500)
+      .json({ message: "Could not fetch products", error: error.message });
   }
-  
 }

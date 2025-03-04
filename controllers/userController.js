@@ -53,6 +53,17 @@ export function loginUser(req, res) {
   });
 }
 
+export function isItAdmin(req) {
+  let isAdmin = false;
+
+  if (req.user != null) {
+    if (req.user.role == "admin") {
+      isAdmin = true;
+    }
+  }
+  return isAdmin;
+}
+
 // import User from "../models/user.js";
 // import bcrypt from "bcrypt";
 
