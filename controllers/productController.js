@@ -26,3 +26,15 @@ export function addProduct(req, res) {
         .json({ message: "Product could not be added", error: err.message });
     });
 }
+
+export async function getProducts(req, res) {
+  try {
+    const product = await Product.find();
+    res.json(product);
+    
+  } catch (error) {
+    res.status(500).json({ message: "Could not fetch products" });
+    
+  }
+  
+}
