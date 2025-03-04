@@ -44,3 +44,24 @@ export async function getProducts(req, res) {
       .json({ message: "Could not fetch products", error: error.message });
   }
 }
+
+
+export async function updateProduct(req, res) {
+  try {
+    if (isItAdmin(req)) {
+      const key = req.params.key;
+      const data = req.body;
+      await Product.updateOne({ key: key }, data);
+      res.json({ message: "Product updated successfully" })
+      return;
+    } else {
+      res.status(403).json({ message: "unauthorized" })
+      return;
+  
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Product could not be updated", error: error.message });
+  }
+}
