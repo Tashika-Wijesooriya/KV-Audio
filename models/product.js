@@ -18,7 +18,7 @@ const productSchema = new mongoose.Schema({
   category: {
     type: String,
     required: true,
-    default:"uncategorized"
+    default: "uncategorized",
   },
   dimension: {
     type: String,
@@ -33,8 +33,15 @@ const productSchema = new mongoose.Schema({
     type: Boolean,
     required: true,
     default: true,
-  }
+  },
+  image: {
+    type: [String],
+    required: true,
+    default:
+      ["https://i.pinimg.com/474x/8c/60/98/8c609895a1b9783451cac96f3ee5af0a.jpg"],
+  },
 });
 
 const Product = mongoose.model("Product", productSchema);
+
 export default Product;
