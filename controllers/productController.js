@@ -65,3 +65,22 @@ export async function updateProduct(req, res) {
       .json({ message: "Product could not be updated", error: error.message });
   }
 }
+
+
+export async function deleteProduct(req, res) {
+  try {
+    if (isItAdmin(req)) {
+      const key = req.params.key;
+      await Product.deleteOne({ key: key });
+      res.json({ message: "Product deleted successfully" });
+    } else {
+      res.status(403).json({ message: "unauthorized" })
+      return;
+    }
+    
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Product could not be deleted", error: error.message });
+  }
+}
