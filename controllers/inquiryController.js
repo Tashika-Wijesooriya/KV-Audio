@@ -1,4 +1,5 @@
 import { isItCustomer } from "./userController.js";
+import Inquiry from "../models/inquiry.js";
 
 export async function addInquiry(req, res) {
   try {
