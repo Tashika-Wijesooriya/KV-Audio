@@ -1,4 +1,4 @@
-import { response } from "express";
+
 import mongoose from "mongoose";
 
 const inquirySchema = new mongoose.Schema({
@@ -21,12 +21,11 @@ const inquirySchema = new mongoose.Schema({
     },
     date: {
         type: Date,
-        default: Date.now(),
+        default: Date.now,
     },
     response: {
         type: String,
-        required: true,
-        default:""
+        default:"",
     },
     isResolved: {
         type: Boolean,

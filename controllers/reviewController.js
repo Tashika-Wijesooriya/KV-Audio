@@ -20,6 +20,7 @@ export function addReview(req, res) {
       res.json({ message: "Review added successfully" });
     })
     .catch((err) => {
+      console.log(err);
       res.status(500).json({ message: "Review could not be added" });
     });
 }

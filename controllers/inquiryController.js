@@ -6,7 +6,6 @@ export async function addInquiry(req, res) {
     if (isItCustomer(req)) {
       const data = req.body;
 
-      data.name = req.user.firstName + " " + req.user.lastName;
       data.email = req.user.email;
       data.phone = req.user.phone;
 
@@ -29,5 +28,6 @@ export async function addInquiry(req, res) {
     }
   } catch (error) {
     res.status(500).json({ message: "Inquiry could not be added" });
+    console.log(error);
   }
 }
