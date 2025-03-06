@@ -1,4 +1,4 @@
-import { isItCustomer } from "./userController.js";
+import { isItAdmin, isItCustomer } from "./userController.js";
 import Inquiry from "../models/inquiry.js";
 
 export async function addInquiry(req, res) {
@@ -28,6 +28,21 @@ export async function addInquiry(req, res) {
     }
   } catch (error) {
     res.status(500).json({ message: "Inquiry could not be added" });
-    console.log(error);
+  }
+}
+
+export async function getInquiries(res, req) {
+  try {
+    if (isItCustomer(req)) {
+      const inquiries = await Inquiry.find({ email: req.user.email });
+      res.json(inquiries);
+      return;
+    } else if (isItAdmin(req)) {
+      const inquiries = await Inquiry.find();
+      res.json(inquiries);
+      return;
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Could not fetch inquiries" });
   }
 }
