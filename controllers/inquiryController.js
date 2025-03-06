@@ -84,3 +84,39 @@ export async function deleteInquiries(req, res) {
     res.status(500).json({ message: "Failed to delete inquiry" });
   }
 }
+
+export async function updateInquiry(req, res) {
+  try {
+    if (await isItAdmin(req)) {
+      const { id } = req.params;
+      const data = req.body;
+      await Inquiry.updateOne({ id: id }, data);
+      return res.json({ message: "Inquiry updated successfully" });
+    } else if (await isItCustomer(req)) {
+      const { id } = req.params;
+      const updateData = req.body;
+
+      const inquiry = await Inquiry.findOne({ _id: id });
+      if (!inquiry) {
+        res.status(404).json({ message: "Inquiry not found" });
+        return;
+      }
+
+      if (inquiry.email === req.user.email) {
+        await Inquiry.updateOne({ id: id }, { message: data.message });
+        res.json({ message: "Inquiry updated successfully" });
+        return;
+      } else {
+        res.status(403).json({ message: "Unauthorized" });
+        return;
+      }
+    } else {
+      res.status(403).json({ message: "Unauthorized" });
+      return;
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to update inquiry" });
+    return;
+  }
+}
