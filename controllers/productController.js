@@ -45,19 +45,17 @@ export async function getProducts(req, res) {
   }
 }
 
-
 export async function updateProduct(req, res) {
   try {
     if (isItAdmin(req)) {
       const key = req.params.key;
       const data = req.body;
       await Product.updateOne({ key: key }, data);
-      res.json({ message: "Product updated successfully" })
+      res.json({ message: "Product updated successfully" });
       return;
     } else {
-      res.status(403).json({ message: "unauthorized" })
+      res.status(403).json({ message: "unauthorized" });
       return;
-  
     }
   } catch (error) {
     res
@@ -66,7 +64,6 @@ export async function updateProduct(req, res) {
   }
 }
 
-
 export async function deleteProduct(req, res) {
   try {
     if (isItAdmin(req)) {
@@ -74,10 +71,9 @@ export async function deleteProduct(req, res) {
       await Product.deleteOne({ key: key });
       res.json({ message: "Product deleted successfully" });
     } else {
-      res.status(403).json({ message: "unauthorized" })
+      res.status(403).json({ message: "unauthorized" });
       return;
     }
-    
   } catch (error) {
     res
       .status(500)

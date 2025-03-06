@@ -76,7 +76,6 @@ export function isItCustomer(req) {
   }
   return isCustomer;
 }
-  
 
 // import User from "../models/user.js";
 // import bcrypt from "bcrypt";
