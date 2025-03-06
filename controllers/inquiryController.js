@@ -46,3 +46,41 @@ export async function getInquiries(res, req) {
     res.status(500).json({ message: "Could not fetch inquiries" });
   }
 }
+
+export async function deleteInquiries(req, res) {
+  try {
+    if (isItAdmin(req)) {
+      const id = req.params.id;
+      await Inquiry.deleteOne({ id: id });
+
+      res.json({ message: "Inquiry deleted successfully" });
+      return;
+    } else if (isItCustomer) {
+      const id = req.params.id;
+      const inquiries = await Inquiry.findOne({ id: id });
+      if (inquiries == null) {
+        res.status(404).json({
+          message: "Inquiry not found",
+        });
+        return;
+      } else {
+        if (inquiries.email == req.user.email) {
+          await Inquiry.deleteOne({ id: id });
+          res.json({ message: "Inquiry deleted successfully" });
+          return;
+        } else {
+          res.status(403).json({
+            message: "unauthorized",
+          });
+        }
+      }
+    } else {
+      res.status(403).json({
+        message: "unauthorized",
+      });
+      return;
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Failed to delete inquiry" });
+  }
+}

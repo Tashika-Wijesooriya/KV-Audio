@@ -1,10 +1,11 @@
 import express from "express";
-import { addInquiry, getInquiries } from "../controllers/inquiryController.js";
+import { addInquiry, deleteInquiries, getInquiries } from "../controllers/inquiryController.js";
 
 const inquiryRouter = express.Router();
 
 inquiryRouter.post("/", addInquiry);
-inquiryRouter.post("/", getInquiries);
+inquiryRouter.get("/", getInquiries);
+inquiryRouter.delete("/:id",deleteInquiries)
 
 
 export default inquiryRouter;
