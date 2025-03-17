@@ -48,6 +48,6 @@ app.use("/api/products", productRouter);
 app.use("/api/reviews", reviewRouter);
 app.use("/api/inquiries", inquiryRouter);
 
-app.listen(3500, () => {
-  console.log("server is running on port 3500");
+app.listen(3600, () => {
+  console.log("server is running on port 3600");
 });
