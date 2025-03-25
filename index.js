@@ -7,6 +7,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import reviewRouter from "./routes/reviewRouter.js";
 import inquiryRouter from "./routes/inquiryRouter.js";
+import cartRouter from "./routes/cartRouter.js";
 import cors from "cors";
 
 
@@ -47,7 +48,8 @@ app.use("/api/users", userRouter);
 app.use("/api/products", productRouter);
 app.use("/api/reviews", reviewRouter);
 app.use("/api/inquiries", inquiryRouter);
+app.use("/cart", cartRouter);
 
-app.listen(3600, () => {
-  console.log("server is running on port 3600");
+app.listen(3500, () => {
+  console.log("server is running on port 3500");
 });
