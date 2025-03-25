@@ -1,16 +1,15 @@
 import express from "express";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
+import dotenv from "dotenv";
 import userRouter from "./routes/userRouter.js";
 import productRouter from "./routes/productRouter.js";
-import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
 import reviewRouter from "./routes/reviewRouter.js";
 import inquiryRouter from "./routes/inquiryRouter.js";
 import cartRouter from "./routes/cartRouter.js";
+import orderRouter from "./routes/orderRouter.js";
+import jwt from "jsonwebtoken";
 import cors from "cors";
-
-
 
 dotenv.config();
 
@@ -49,6 +48,7 @@ app.use("/api/products", productRouter);
 app.use("/api/reviews", reviewRouter);
 app.use("/api/inquiries", inquiryRouter);
 app.use("/cart", cartRouter);
+app.use("/api/orders", orderRouter);
 
 app.listen(3500, () => {
   console.log("server is running on port 3500");
