@@ -80,3 +80,21 @@ export async function deleteProduct(req, res) {
       .json({ message: "Product could not be deleted", error: error.message });
   }
 }
+
+
+export async function getProduct(req, res) {
+  try {
+    const key = req.params.key;
+    const product = await Product.findOne({ key: key });
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    return res.json(product);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Product could not be fetched", error: error.message });
+  }
+}
