@@ -2,74 +2,95 @@ import Order from "../models/order.js";
 import Product from "../models/product.js";
 
 export async function createOrder(req, res) {
-  try {
-    const data = req.body;
-    const orderInfo = {
-      orderItems: [],
-    };
+  const data = req.body;
+  const orderInfo = {
+    orderedItems: [],
+  };
 
-    // Check if the user is authenticated
-    if (!req.user) {
-      return res.status(401).json({ message: "Login first" });
-    }
-    orderInfo.email = req.user.email;
+  if (req.user == null) {
+    res.status(401).json({
+      message: "Please login and try again",
+    });
+    return;
+  }
+  orderInfo.email = req.user.email;
 
-    // Find the last order based on orderId in descending order
-    const lastOrder = await Order.find().sort({ orderId: -1 }).limit(1);
+  // Fetch the last order to generate the new orderId
+  const lastOrder = await Order.find().sort({ orderDate: -1 }).limit(1);
 
-    if (lastOrder.length === 0) {
-      orderInfo.orderId = "ORD0001";
-    } else {
-      const lastOrderId = lastOrder[0].orderId; // e.g., "ORD0023"
-      const lastOrderNumber = parseInt(lastOrderId.replace("ORD", ""), 10); // Extract numeric part
+  // Set the orderId based on the last order or initialize from "ORD0001"
+  if (lastOrder.length === 0) {
+    orderInfo.orderId = "ORD0001";
+  } else {
+    const lastOrderId = lastOrder[0].orderId;
+    const lastOrderNumberInString = lastOrderId.replace("ORD", "");
+    const lastOrderNumber = parseInt(lastOrderNumberInString);
+    const currentOrderNumber = lastOrderNumber + 1;
+    const formattedNumber = String(currentOrderNumber).padStart(4, "0");
+    orderInfo.orderId = "ORD" + formattedNumber;
+  }
 
-      const currentOrderNumber = lastOrderNumber + 1;
-      const formattedNumber = currentOrderNumber.toString().padStart(4, "0"); // Ensure 4 digits
+  let oneDayCost = 0;
 
-      orderInfo.orderId = "ORD" + formattedNumber;
-    }
+  // Process ordered items and check product availability
+  for (let i = 0; i < data.orderedItems.length; i++) {
+    try {
+      const product = await Product.findOne({ key: data.orderedItems[i].key });
 
-    let oneDayCost = 0;
-
-    for (let i = 0; i < data.orderItems.length; i++) {
-      try {
-        const product = await Product.findOne({ key: data.orderItems[i].product.key });
-
-        if (!product) {
-          return res.status(400).json({
-            message: `Product with key ${data.orderItems[i].product.key} not found`,
-          });
-        }
-
-        orderInfo.orderItems.push({
-          product: {
-            key: product.key,
-            name: product.name,
-            image: product.image[0],
-            price: product.price,
-          },
-          quantity: data.orderItems[i].quantity,
+      if (!product) {
+        res.status(404).json({
+          message: `Product with key ${data.orderedItems[i].key} not found`,
         });
-
-        oneDayCost += product.price * data.orderItems[i].quantity;
-      } catch (error) {
-        console.error("Error finding product:", error);
-        return res.status(500).json({ message: "Failed to retrieve product details" });
+        return;
       }
+
+      if (product.availability === false) {
+        res.status(400).json({
+          message: `Product with key ${data.orderedItems[i].key} is not available`,
+        });
+        return;
+      }
+
+      orderInfo.orderedItems.push({
+        product: {
+          key: product.key,
+          name: product.name,
+          image: product.image[0],
+          price: product.price,
+        },
+        quantity: data.orderedItems[i].qty,
+      });
+
+      oneDayCost += product.price * data.orderedItems[i].qty;
+    } catch (e) {
+      console.error("Error processing ordered item:", e); // Log the error for debugging
+      res.status(500).json({
+        message: `Failed to process item with key ${data.orderedItems[i].key}`,
+        error: e.message || e,
+      });
+      return;
     }
+  }
 
-    orderInfo.days = data.days;
-    orderInfo.startingDate = data.startingDate;
-    orderInfo.endingDate = data.endingDate;
-    orderInfo.totalAmount = oneDayCost * data.days; // Calculate total amount
+  // Set additional order details
+  orderInfo.days = data.days;
+  orderInfo.startingDate = data.startingDate;
+  orderInfo.endingDate = data.endingDate;
+  orderInfo.totalAmount = oneDayCost * data.days;
 
-    // Create a new order instance
+  // Create the new order and save it to the database
+  try {
     const newOrder = new Order(orderInfo);
-    await newOrder.save(); // Save to the database
-
-    res.status(201).json({ message: "Order created successfully", order: newOrder });
-  } catch (error) {
-    console.error("Error creating order:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    const result = await newOrder.save();
+    res.json({
+      message: "Order created successfully",
+      order: result,
+    });
+  } catch (e) {
+    console.error("Error saving order:", e); // Log the error for debugging
+    res.status(500).json({
+      message: "Failed to create order",
+      error: e.message || e,
+    });
   }
 }
