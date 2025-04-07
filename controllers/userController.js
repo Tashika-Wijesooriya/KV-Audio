@@ -29,6 +29,10 @@ export function loginUser(req, res) {
     if (!user) {
       res.status(404).json({ message: "User not found" });
     } else {
+      if (user.isBlocked) {
+        res.status(403).json({ message: "User is blocked" });
+        return;
+      }
       const isPasswordCorrect = bcrypt.compareSync(
         data.password,
         user.password
@@ -77,4 +81,37 @@ export function isItCustomer(req) {
   return isCustomer;
 }
 
+export async function getAllUsers(req, res) {
+  if (isItAdmin(req)) {
+    try {
+      const users = await User.find({});
+      res.json(users);
+    } catch (e) {
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+    
+  }else{
+    res.status(403).json({ message: "Access denied" });
+  }
+  
+}
 
+export async function blockORUnblockUser(req, res) {
+  const email = req.params.email;
+  if(isItAdmin(req)){
+    try {  
+      const user = await User.findOne({ email: email });
+      if (user) {
+        user.isBlocked = !user.isBlocked;
+        await user.save();
+        res.json({ message: "User blocked successfully" });
+      } else {
+        res.status(404).json({ message: "User not found" });
+      }
+    } catch (e) {
+      res.status(500).json({ message: "Failed to block user" });
+    }
+  }else{
+    res.status(403).json({ message: "Access denied" });
+  }
+}
