@@ -1,5 +1,6 @@
 import Order from "../models/order.js";
 import Product from "../models/product.js";
+import { isItCustomer , isItAdmin} from "./userController.js";
 
 export async function createOrder(req, res) {
   const data = req.body;
@@ -162,6 +163,27 @@ export async function getQuotes(req, res) {
     console.error("Error saving order:", e); // Log the error for debugging
     res.status(500).json({
       message: "Failed to create order",
+      error: e.message || e,
+    });
+  }
+}
+
+export async function getOrders(req, res) {
+  try {
+  if (isItCustomer(req)) {
+    const orders = await Order.find({ email: req.user.email });
+    res.json(orders); 
+    
+  }else if (isItAdmin(req)) {
+    const orders = await Order.find();
+    res.json(orders); 
+  } else {
+    res.status(403).json({ message: "Access denied" });
+  }
+  } catch (e) {
+    console.error("Error fetching orders:", e); // Log the error for debugging
+    res.status(500).json({
+      message: "Failed to fetch orders",
       error: e.message || e,
     });
   }

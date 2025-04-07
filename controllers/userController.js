@@ -31,7 +31,7 @@ export function loginUser(req, res) {
     } else {
       if (user.isBlocked) {
         res.status(403).json({ message: "User is blocked" });
-        return;
+        return;   
       }
       const isPasswordCorrect = bcrypt.compareSync(
         data.password,
