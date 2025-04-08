@@ -115,3 +115,21 @@ export async function blockORUnblockUser(req, res) {
     res.status(403).json({ message: "Access denied" });
   }
 }
+
+
+export async function getUser(req, res) {
+  if (req.user != null) {
+    try {
+      const user = await User.findOne({ email: req.user.email });
+      if (user) {
+        res.json(user);
+      } else {
+        res.status(404).json({ message: "User not found" });
+      }
+    } catch (e) {
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  } else {
+    res.status(401).json({ message: "Unauthorized" });
+  }
+}
