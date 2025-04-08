@@ -5,6 +5,7 @@ import {
   getUser,
   loginUser,
   registerUser,
+  loginWithGoogle,
 } from "../controllers/userController.js";
 
 const userRouter = express.Router();
@@ -18,5 +19,7 @@ userRouter.get("/all", getAllUsers);
 userRouter.put("/block/:email", blockORUnblockUser);
 
 userRouter.get("/", getUser);
+
+userRouter.post("/google", loginWithGoogle);
 
 export default userRouter;
