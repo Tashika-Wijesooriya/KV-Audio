@@ -1,6 +1,6 @@
 import Order from "../models/order.js";
 import Product from "../models/product.js";
-import { isItCustomer , isItAdmin} from "./userController.js";
+import { isItCustomer, isItAdmin } from "./userController.js";
 
 export async function createOrder(req, res) {
   const data = req.body;
@@ -102,11 +102,8 @@ export async function getQuotes(req, res) {
     orderedItems: [],
   };
 
- 
-
   let oneDayCost = 0;
 
- 
   for (let i = 0; i < data.orderedItems.length; i++) {
     try {
       const product = await Product.findOne({ key: data.orderedItems[i].key });
@@ -154,7 +151,6 @@ export async function getQuotes(req, res) {
 
   // Create the new order and save it to the database
   try {
-   
     res.json({
       message: "Order quotetion  successfully",
       total: orderInfo.totalAmount,
@@ -170,16 +166,15 @@ export async function getQuotes(req, res) {
 
 export async function getOrders(req, res) {
   try {
-  if (isItCustomer(req)) {
-    const orders = await Order.find({ email: req.user.email });
-    res.json(orders); 
-    
-  }else if (isItAdmin(req)) {
-    const orders = await Order.find();
-    res.json(orders); 
-  } else {
-    res.status(403).json({ message: "Access denied" });
-  }
+    if (isItCustomer(req)) {
+      const orders = await Order.find({ email: req.user.email });
+      res.json(orders);
+    } else if (isItAdmin(req)) {
+      const orders = await Order.find();
+      res.json(orders);
+    } else {
+      res.status(403).json({ message: "Access denied" });
+    }
   } catch (e) {
     console.error("Error fetching orders:", e); // Log the error for debugging
     res.status(500).json({
@@ -189,3 +184,34 @@ export async function getOrders(req, res) {
   }
 }
 
+export async function approveORRejectOrder(req, res) {
+  const orderId = req.params.id;
+  const { status } = req.body; // Expecting status to be either "Approved" or "Rejected"
+
+  if (!["Approved", "Rejected"].includes(status)) {
+    return res.status(400).json({ message: "Invalid status value" });
+  }
+
+  try {
+    const updatedOrder = await Order.findByIdAndUpdate(
+      orderId,
+      { isApproved: status },
+      { new: true }
+    );
+
+    if (!updatedOrder) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    res.json({
+      message: `Order ${status} successfully`,
+      order: updatedOrder,
+    });
+  } catch (e) {
+    console.error("Error updating order:", e); // Log the error for debugging
+    res.status(500).json({
+      message: "Failed to update order",
+      error: e.message || e,
+    });
+  }
+}
