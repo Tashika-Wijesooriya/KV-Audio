@@ -1,5 +1,10 @@
 import express from "express";
-import { approveORRejectOrder, createOrder, getOrders, getQuotes } from "../controllers/orderController.js";
+import {
+  approveORRejectOrder,
+  createOrder,
+  getOrders,
+  getQuotes,
+} from "../controllers/orderController.js";
 
 const orderRouter = express.Router();
 

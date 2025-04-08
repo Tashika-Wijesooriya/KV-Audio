@@ -81,7 +81,6 @@ export async function deleteProduct(req, res) {
   }
 }
 
-
 export async function getProduct(req, res) {
   try {
     const key = req.params.key;

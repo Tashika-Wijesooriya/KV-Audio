@@ -41,6 +41,11 @@ const userSchema = new mongoose.Schema({
     default:
       "https://i.pinimg.com/474x/03/eb/d6/03ebd625cc0b9d636256ecc44c0ea324.jpg",
   },
+  emailVerified: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
 });
 
 const User = mongoose.model("User", userSchema);
