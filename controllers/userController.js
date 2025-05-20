@@ -8,7 +8,6 @@ import nodemailer from "nodemailer";
 import OTP from "../models/otp.js";
 
 dotenv.config();
-
 const transport = nodemailer.createTransport({
   service: "gmail",
   host: "smtp.gmail.com",
@@ -23,7 +22,6 @@ const transport = nodemailer.createTransport({
 export function registerUser(req, res) {
   const data = req.body;
 
-  // Hash the password
   data.password = bcrypt.hashSync(data.password, 10);
 
   const newUser = new User(data);
@@ -34,9 +32,7 @@ export function registerUser(req, res) {
       res.json({ message: "User added successfully" });
     })
     .catch((err) => {
-      res
-        .status(500)
-        .json({ message: "User could not be added", error: err.message });
+      res.status(500).json({ message: "user could not be added" });
     });
 }
 
@@ -45,32 +41,35 @@ export function loginUser(req, res) {
 
   User.findOne({ email: data.email }).then((user) => {
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    if (user.isBlocked) {
-      return res.status(403).json({ message: "User is blocked" });
-    }
-
-    const isPasswordCorrect = bcrypt.compareSync(data.password, user.password);
-
-    if (isPasswordCorrect) {
-      const token = jwt.sign(
-        {
-          firstName: user.firstName,
-          lastName: user.lastName,
-          role: user.role,
-          profilePicture: user.profilePicture,
-          email: user.email,
-          phone: user.phone,
-          emailVerified: user.emailVerified,
-        },
-        process.env.JWT_SECRET
+      res.status(404).json({ message: "User not found" });
+    } else {
+      if (user.isBlocked) {
+        res.status(403).json({ message: "User is blocked" });
+        return;
+      }
+      const isPasswordCorrect = bcrypt.compareSync(
+        data.password,
+        user.password
       );
 
-      res.json({ message: "Login successful", token: token, user: user });
-    } else {
-      res.status(401).json({ message: "Invalid credentials" });
+      if (isPasswordCorrect) {
+        const token = jwt.sign(
+          {
+            firstName: user.firstName,
+            lastName: user.lastName,
+            role: user.role,
+            profilePicture: user.profilePicture,
+            email: user.email,
+            phone: user.phone,
+            verified: user.emailVerified,
+          },
+          process.env.JWT_SECRET
+        );
+
+        res.json({ message: "Login successful", token: token, user: user });
+      } else {
+        res.status(401).json({ message: "Login failed" });
+      }
     }
   });
 }
@@ -103,9 +102,7 @@ export async function getAllUsers(req, res) {
       const users = await User.find({});
       res.json(users);
     } catch (e) {
-      res
-        .status(500)
-        .json({ message: "Failed to fetch users", error: e.message });
+      res.status(500).json({ message: "Failed to fetch users" });
     }
   } else {
     res.status(403).json({ message: "Access denied" });
@@ -114,21 +111,18 @@ export async function getAllUsers(req, res) {
 
 export async function blockORUnblockUser(req, res) {
   const email = req.params.email;
-
   if (isItAdmin(req)) {
     try {
       const user = await User.findOne({ email: email });
       if (user) {
         user.isBlocked = !user.isBlocked;
         await user.save();
-        res.json({ message: "User blocked/unblocked successfully" });
+        res.json({ message: "User blocked successfully" });
       } else {
         res.status(404).json({ message: "User not found" });
       }
     } catch (e) {
-      res
-        .status(500)
-        .json({ message: "Failed to block/unblock user", error: e.message });
+      res.status(500).json({ message: "Failed to block user" });
     }
   } else {
     res.status(403).json({ message: "Access denied" });
@@ -136,7 +130,7 @@ export async function blockORUnblockUser(req, res) {
 }
 
 export async function getUser(req, res) {
-  if (req.user) {
+  if (req.user != null) {
     try {
       const user = await User.findOne({ email: req.user.email });
       if (user) {
@@ -145,9 +139,7 @@ export async function getUser(req, res) {
         res.status(404).json({ message: "User not found" });
       }
     } catch (e) {
-      res
-        .status(500)
-        .json({ message: "Failed to fetch user", error: e.message });
+      res.status(500).json({ message: "Failed to fetch user" });
     }
   } else {
     res.status(401).json({ message: "Unauthorized" });
@@ -184,6 +176,7 @@ export async function loginWithGoogle(req, res) {
         address: "Not Provided",
         phone: "Not Provided",
         profilePicture: googleUser.picture || "",
+
         emailVerified: true,
       });
 
@@ -200,8 +193,7 @@ export async function loginWithGoogle(req, res) {
         phone: user.phone,
         emailVerified: true,
       },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" } // Token expiration set to 1 hour
+      process.env.JWT_SECRET
     );
 
     res.json({ message: "Login successful", token, user });
@@ -210,7 +202,6 @@ export async function loginWithGoogle(req, res) {
     res.status(500).json({ message: "Failed to login with Google" });
   }
 }
-
 export async function sendOTP(req, res) {
   if (!req.user) return res.status(403).json({ error: "Unauthorized" });
 
@@ -240,6 +231,7 @@ export async function sendOTP(req, res) {
   }
 }
 
+// Verify OTP
 export async function verifyOTP(req, res) {
   if (!req.user) return res.status(403).json({ error: "Unauthorized" });
 

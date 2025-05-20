@@ -20,6 +20,6 @@ userRouter.get("/", getUser);
 userRouter.post("/google", loginWithGoogle);
 
 userRouter.get("/sendOTP", sendOTP);
-userRouter.post("/verifyOTP", verifyOTP);
+userRouter.post("/verifyEmail", verifyOTP);
 
 export default userRouter;
